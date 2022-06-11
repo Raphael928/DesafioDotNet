@@ -1,4 +1,5 @@
 using DESAFIOKHIPO.DesafioDotNet.Data;
+using DESAFIOKHIPO.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -16,6 +17,8 @@ builder.Services.AddDbContext<ProductDBContext>(options =>
     /*"server=localhost;database=Loja;user id=raphael;password=teste"*/
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoSQLServer"));
 });
+
+builder.Services.AddScoped<IProductsRepository, ProductRepository>();
 
 var app = builder.Build();
 
