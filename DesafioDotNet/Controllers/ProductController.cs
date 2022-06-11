@@ -1,5 +1,5 @@
 using DESAFIOKHIPO.DesafioDotNet.Models;
-using DESAFIOKHIPO.Repository;
+using DESAFIOKHIPO.DesafioDotNet.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DESAFIOKHIPO.DesafioDotNet.Controllers
