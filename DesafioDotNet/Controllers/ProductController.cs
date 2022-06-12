@@ -30,13 +30,22 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(Product pProduct)
+        public async Task<IActionResult> PostNew(Product pProduct)
         {
-            _Repository.AddProduct(pProduct);
-            return await _Repository.SaveChangesAsync() ? Ok("Product Saved!") : BadRequest("Error adding product!");
+            var lProductDataBase = new Product();
+
+            lProductDataBase.Id = 0;
+            lProductDataBase.Name = pProduct.Name;
+            lProductDataBase.Brand = pProduct.Brand;
+            lProductDataBase.Price = pProduct.Price;
+            lProductDataBase.CreatedAt = DateTime.Now;
+            lProductDataBase.UpdatedAt = DateTime.Now;
+
+            _Repository.AddProduct(lProductDataBase);
+            return await _Repository.SaveChangesAsync() ? Ok(lProductDataBase) : BadRequest("Error adding product!");
         }
 
-        [HttpPut("{:ProductId}")]
+        [HttpPut]
         public async Task<IActionResult> Put(int pProductID, Product pProduct)
         {
             var lProductDataBase = await _Repository.SearchProductById(pProductID);
@@ -52,10 +61,10 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
 
             _Repository.RefreshProduct(lProductDataBase);
 
-            return await _Repository.SaveChangesAsync() ? Ok("updated product!") : BadRequest("Error changing product!");
+            return await _Repository.SaveChangesAsync() ? Ok(lProductDataBase) : BadRequest("Error changing product!");
         }
 
-        [HttpDelete("{:ProductId}")]
+        [HttpDelete]
         public async Task<IActionResult> Delete(int pProductID)
         {
             var lProduct = await _Repository.SearchProductById(pProductID);
@@ -64,7 +73,7 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
 
             _Repository.DeleteProduct(lProduct);
 
-            return await _Repository.SaveChangesAsync() ? Ok("Deleted product!") : BadRequest("Error deleting product!");
+            return await _Repository.SaveChangesAsync() ? Ok(true) : BadRequest("Error deleting product!");
         }
     }
 }

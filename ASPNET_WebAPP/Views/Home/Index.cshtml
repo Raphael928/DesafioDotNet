@@ -13,7 +13,7 @@
                         <h6>Products</h6>
                     </div>
                     <div class="col-4">
-                        <button class="btn btn-sm btn-outline-success novaPessoa">New Product</button>
+                        <button class="btn btn-sm btn-outline-success newProduct">New Product</button>
                     </div>
                 </div>
 
@@ -38,7 +38,10 @@
             </div>
 
             <div class="modal-body">
-                <input type="hidden" class="form-control form-control-sm pessoaId" />
+                <input type="hidden" class="form-control form-control-sm productId" />
+                <input type="hidden" class="form-control form-control-sm createdAT" />
+                <input type="hidden" class="form-control form-control-sm updatedAT" />
+
                 <div class="form-group">
                     <label>Name</label>
                     <input type="text" class="form-control form-control-sm Name" />
@@ -47,7 +50,7 @@
 
                 <div class="form-group">
                     <label>Price</label>
-                    <input type="number" class="form-control form-control-sm Price" />
+                    <input type="number" data-inputmask="'R$': 'currency'" class="form-control form-control-sm Price" />
                     <span class="text-danger errPrice d-none">Enter the Price</span>
                 </div>
 
@@ -60,8 +63,8 @@
 
             <div class="modal-footer">
                 <div class="form-group">
-                    <input type="button" value="Salvar" class="btn btn-sm btn-outline-success btnSalvar" />
-                    <input type="button" value="Cancelar" class="btn btn-sm btn-light" data-bs-dismiss="modal" />
+                    <input type="button" value="Save" class="btn btn-sm btn-outline-success btnSalvar" />
+                    <input type="button" value="Cancel" class="btn btn-sm btn-light" data-bs-dismiss="modal" />
                 </div>
             </div>
         </div>
@@ -85,44 +88,50 @@
         });
     }
 
-    $(".novaPessoa").click(function () {
-        escolherTituloModal("Cadastro de nova pessoa");
+    $(".newProduct").click(function () {
+        escolherTituloModal("new product registration");
         mostrarModal();
         limparFormulario();
-        $('.pessoaId').val(0);
+        $('.Id').val(0);
     });
 
     $(".btnSalvar").click(function () {
-        var pessoa = {
-            pessoaId: $('.pessoaId').val(),
+        var product = {
+            Id: $('.productId').val() > 0 ? $('.productId').val() : "0",
             Name: $('.Name').val(),
             Price: $('.Price').val(),
-            Brand: $('.Brand').val()
+            Brand: $('.Brand').val(),
         };
-        if (validarFormulario(pessoa)) {
-            if (parseInt(pessoa.pessoaId) > 0)
-                atualizarPessoa(pessoa);
-            criarPessoa(pessoa);
+        if (validarFormulario(product)) {
+            if (parseInt(product.Id) > 0)
+                UpdateProduct(product.Id, product);
+            else
+                CreateProduct(product);
         }
     });
 
-    function criarPessoa(pessoa) {
+    function CreateProduct(product) {
+        var productJSON = JSON.stringify(product);
+
         $.ajax({
-            url: "Pessoas/NovaPessoa",
+            url: " https://localhost:7100/api/Product",
             method: 'POST',
-            data: {
-                pessoa: pessoa
-            },
-            success: function (pessoaCriada) {
+            accepts: "*/*",
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: productJSON,
+            success: function (ProductCreated) {
                 $("#modal").modal('hide');
-                var linhaNovoProduto = `<tr id="${pessoaCriada.pessoaId}">`;
-                linhaNovoProduto += `<td>${pessoaCriada.Name}</td>`;
-                linhaNovoProduto += `<td>${pessoaCriada.Price}</td>`;
-                linhaNovoProduto += `<td>${pessoaCriada.Brand}</td>`;
+                var linhaNovoProduto = `<tr id="${ProductCreated.id}">`;
+                linhaNovoProduto += `<td>${ProductCreated.name}</td>`;
+                linhaNovoProduto += `<td>${ProductCreated.price}</td>`;
+                linhaNovoProduto += `<td>${ProductCreated.brand}</td>`;
+                linhaNovoProduto += `<td>${ProductCreated.createdAt}</td>`;
+                linhaNovoProduto += `<td>${ProductCreated.updatedAt}</td>`;
                 linhaNovoProduto += `<td><button class="btn btn-sm btn-outline-info"
-                    onclick="pegarPessoaPeloId(${pessoaCriada.pessoaId})">Atualizar</button> |
+                    onclick="SearchProductById(${ProductCreated.id})">Edit</button> |
                     <button class="btn btn-sm btn-outline-danger"
-                    onclick="excluirPessoaPeloId(${pessoaCriada.pessoaId})">Excluir</button></td>`;
+                    onclick="DeleteProduct(${ProductCreated.id})">Delete</button></td>`;
                 linhaNovoProduto += '</tr>';
                 $(".tabela tbody").append(linhaNovoProduto);
                 limparFormulario();
@@ -130,53 +139,58 @@
         });
     }
 
-    function pegarPessoaPeloId(pessoaId) {
+    function SearchProductById(productId) {
         $.ajax({
-            url: "Pessoas/PegarPessoaPeloId",
+            url: "https://localhost:7100/api/Product/GetById",
             method: 'GET',
             data: {
-                pessoaId: pessoaId
+                pProductID: productId
             },
-            success: function (pessoa) {
+            success: function (product) {
                 mostrarModal();
-                escolherTituloModal(`Atualizar pessoa ${pessoa.Name}`);
-                $(".pessoaId").val(pessoa.pessoaId);
-                $(".Name").val(pessoa.Name);
-                $(".Price").val(pessoa.Price);
-                $(".Brand").val(pessoa.Brand);
+                escolherTituloModal(`Update Product ${product.name}`);
+                $(".productId").val(product.id);
+                $(".Name").val(product.name);
+                $(".Price").val(product.price);
+                $(".Brand").val(product.brand);
+                $(".createdAT").val(product.createdAt);
+                $(".updatedAT").val(product.updatedAt);
             }
         })
     }
 
-    function atualizarPessoa(pessoa) {
+    function UpdateProduct(productId, product) {
+        var productJSON = JSON.stringify(product);
+
         $.ajax({
-            url: "Pessoas/AtualizarPessoa",
-            method: 'POST',
-            data: {
-                pessoa: pessoa
-            },
-            success: function (pessoaAtualizada) {
+            url: "https://localhost:7100/api/Product?pProductID=" + productId,
+            type: 'PUT',
+            accepts: "*/*",
+            contentType: "application/json;",
+            data: productJSON,
+            success: function (productUpdated) {
                 $("#modal").modal('hide');
-                var linhaTabela = $(`#${pessoaAtualizada.pessoaId}`);
-                linhaTabela[0].childNodes[0].innerText = pessoaAtualizada.Name;
-                linhaTabela[0].childNodes[1].innerText = pessoaAtualizada.Price;
-                linhaTabela[0].childNodes[2].innerText = pessoaAtualizada.Brand;
+                var linhaTabela = $(`#${productUpdated.id}`);
+                linhaTabela[0].childNodes[0].innerText = productUpdated.name;
+                linhaTabela[0].childNodes[1].innerText = productUpdated.price;
+                linhaTabela[0].childNodes[2].innerText = productUpdated.brand;
+                linhaTabela[0].childNodes[3].innerText = productUpdated.createdAt;
+                linhaTabela[0].childNodes[4].innerText = productUpdated.updatedAt;
                 limparFormulario();
             }
         });
     }
 
-    function excluirPessoa(pessoaId) {
+    function DeleteProduct(productId) {
         $.ajax({
-            url: "Pessoas/ExcluirPessoa",
-            method: 'POST',
-            data: {
-                pessoaId: pessoaId
-            },
+            url: "https://localhost:7100/api/Product?pProductID=" + productId,
+            type: 'DELETE',
+            accepts: "*/*",
+            contentType: "application/json;",
             success: function (status) {
                 if (status) {
-                    alert("Pessoa excluída com sucesso");
-                    document.getElementById(pessoaId).remove();
+                    alert("deleted product!");
+                    document.getElementById(productId).remove();
                 }
                 else
                     alert(status.mensagem);
@@ -209,8 +223,8 @@
             tabela += `<td>${products[indice].brand}</td>`;
             tabela += `<td>${vCreatedAt.toLocaleDateString('pt-BR')}</td>`;
             tabela += `<td>${vUpdatedAt.toLocaleDateString('pt-BR')}</td>`;
-            tabela += `<td><button class="btn btn-sm btn-outline-info" onclick="pegarPessoaPeloId(${products[indice].id})">Atualizar</button> |
-                        <button class="btn btn-sm btn-outline-danger" onclick="excluirPessoa(${products[indice].id})">Excluir</button></td>`;
+            tabela += `<td><button class="btn btn-sm btn-outline-info" onclick="SearchProductById(${products[indice].id})">Edit</button> |
+                        <button class="btn btn-sm btn-outline-danger" onclick="DeleteProduct(${products[indice].id})">Delete</button></td>`;
             tabela += '</tr>';
         }
         tabela += '</tbody>';
@@ -218,26 +232,20 @@
         divTabela.innerHTML = tabela;
     }
 
-    function validarFormulario(pessoa) {
-        let NameValido = validarName(pessoa.Name);
-        let PriceValida = validarPrice(pessoa.Price);
-        let BrandValida = validarBrand(pessoa.Brand);
+    function validarFormulario(product) {
+        let NameValido = validarName(product.Name);
+        let PriceValida = validarPrice(product.Price);
+        let BrandValida = validarBrand(product.Brand);
         if (NameValido == true && PriceValida == true && BrandValida == true)
             return true;
         return false;
     }
-
+    /* #region Validação */
     function validarName(Name) {
         let NameValido = true;
         if (Name.trim() == '' || Name == undefined) {
             $(".Name").addClass('is-invalid');
-            $(".errName").text("Preencha o Name");
-            $(".errName").removeClass("d-none");
-            NameValido = false;
-        }
-        else if (Name.length > 20) {
-            $(".Name").addClass('is-invalid');
-            $(".errName").text("Use menos caracteres");
+            $(".errName").text("fill in the name");
             $(".errName").removeClass("d-none");
             NameValido = false;
         }
@@ -249,17 +257,12 @@
         }
         return NameValido;
     }
+
     function validarPrice(Price) {
         let PriceValida = true;
         if (isNaN(Price) || Price == undefined || Price == '') {
             $(".Price").addClass('is-invalid');
-            $(".erroPrice").text("Preencha a Price");
-            $(".erroPrice").removeClass("d-none");
-            PriceValida = false;
-        }
-        else if (parseInt(Price) < 18 || parseInt(Price) > 100) {
-            $(".Price").addClass('is-invalid');
-            $(".erroPrice").text("Price inválida");
+            $(".erroPrice").text("fill in the price");
             $(".erroPrice").removeClass("d-none");
             PriceValida = false;
         }
@@ -271,17 +274,12 @@
         }
         return PriceValida;
     }
+
     function validarBrand(Brand) {
         let BrandValida = true;
         if (Brand.trim() == '' || Brand == undefined) {
             $(".Brand").addClass('is-invalid');
-            $(".errBrand").text("Preencha a profissão");
-            $(".errBrand").removeClass("d-none");
-            BrandValida = false;
-        }
-        else if (Brand.length > 50) {
-            $(".Brand").addClass('is-invalid');
-            $(".errBrand").text("Use menos caracteres");
+            $(".errBrand").text("fill in the brand");
             $(".errBrand").removeClass("d-none");
             BrandValida = false;
         }
@@ -293,9 +291,12 @@
         }
         return BrandValida;
     }
+    /* #endregion */
+
     function mostrarModal() {
         new bootstrap.Modal($("#modal"), {}).show();
     }
+
     function limparFormulario() {
         $(".Name").val('');
         $(".Name").removeClass('is-valid');
@@ -304,8 +305,10 @@
         $(".Brand").val('');
         $(".Brand").removeClass('is-valid');
     }
+
     function escolherTituloModal(texto) {
         $(".modal-title").text(texto);
     }
+
 </script>
 }
