@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DESAFIOKHIPO</name>
+    </assembly>
+    <members>
+        <member name="M:DESAFIOKHIPO.DesafioDotNet.Controllers.ProductController.Get">
+            <summary>
+            Retorna todos os produtos em lista.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DESAFIOKHIPO.DesafioDotNet.Controllers.ProductController.GetById(System.Int32)">
+            <summary>
+            Retorna apenas o produto do productId.
+            </summary>
+            <param name="pProductID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DESAFIOKHIPO.DesafioDotNet.Controllers.ProductController.PostNew(DESAFIOKHIPO.DesafioDotNet.Models.Product)">
+            <summary>
+            Cria um produto.
+            </summary>
+        </member>
+        <member name="M:DESAFIOKHIPO.DesafioDotNet.Controllers.ProductController.Put(System.Int32,DESAFIOKHIPO.DesafioDotNet.Models.Product)">
+            <summary>
+            Edita o produto do productId.
+            </summary>
+            <param name="pProductID"></param>
+            <param name="pProduct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DESAFIOKHIPO.DesafioDotNet.Controllers.ProductController.Delete(System.Int32)">
+            <summary>
+            Apaga o produto do productId.
+            </summary>
+            <param name="pProductID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DESAFIOKHIPO.Repository.ProductRepository.DESAFIOKHIPO#DesafioDotNet#Repository#IProductsRepository#DeleteProduct(DESAFIOKHIPO.DesafioDotNet.Models.Product)">
+            <summary>
+            Deletes a specific TodoItem.
+            </summary>
+            <param name="pProduct"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

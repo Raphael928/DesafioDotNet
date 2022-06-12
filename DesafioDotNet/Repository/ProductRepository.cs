@@ -19,6 +19,11 @@ namespace DESAFIOKHIPO.Repository
             _Context.Add(pProduct);
         }
 
+        /// <summary>
+        /// Deletes a specific TodoItem.
+        /// </summary>
+        /// <param name="pProduct"></param>
+        /// <returns></returns>
         void IProductsRepository.DeleteProduct(Product pProduct)
         {
             _Context.Remove(pProduct);

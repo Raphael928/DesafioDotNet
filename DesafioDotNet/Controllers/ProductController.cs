@@ -15,6 +15,10 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
             _Repository = pRepository;
         }
 
+        /// <summary>
+        /// Retorna todos os produtos em lista.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -22,6 +26,12 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
             return lProducts.Any() ? Ok(lProducts) : NoContent();
         }
 
+
+        /// <summary>
+        /// Retorna apenas o produto do productId.
+        /// </summary>
+        /// <param name="pProductID"></param>
+        /// <returns></returns>
         [HttpGet("{:ProductId}")]
         public async Task<IActionResult> GetById(int pProductID)
         {
@@ -29,6 +39,9 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
             return lProduct != null ? Ok(lProduct) : NotFound("No product found!");
         }
 
+        /// <summary>
+        /// Cria um produto.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> PostNew(Product pProduct)
         {
@@ -45,6 +58,12 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
             return await _Repository.SaveChangesAsync() ? Ok(lProductDataBase) : BadRequest("Error adding product!");
         }
 
+        /// <summary>
+        /// Edita o produto do productId.
+        /// </summary>
+        /// <param name="pProductID"></param>
+        /// <param name="pProduct"></param>
+        /// <returns></returns>
         [HttpPut]
         public async Task<IActionResult> Put(int pProductID, Product pProduct)
         {
@@ -64,6 +83,11 @@ namespace DESAFIOKHIPO.DesafioDotNet.Controllers
             return await _Repository.SaveChangesAsync() ? Ok(lProductDataBase) : BadRequest("Error changing product!");
         }
 
+        /// <summary>
+        /// Apaga o produto do productId.
+        /// </summary>
+        /// <param name="pProductID"></param>
+        /// <returns></returns>
         [HttpDelete]
         public async Task<IActionResult> Delete(int pProductID)
         {

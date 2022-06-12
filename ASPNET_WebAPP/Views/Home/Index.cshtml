@@ -50,7 +50,8 @@
 
                 <div class="form-group">
                     <label>Price</label>
-                    <input type="number" data-inputmask="'R$': 'currency'" class="form-control form-control-sm Price" />
+                    <input type="number" data-inputmask="'alias': 'currency'"
+                        class="form-control form-control-sm Price" />
                     <span class="text-danger errPrice d-none">Enter the Price</span>
                 </div>
 
@@ -92,7 +93,7 @@
         escolherTituloModal("new product registration");
         mostrarModal();
         limparFormulario();
-        $('.Id').val(0);
+        $('.productId').val(0);
     });
 
     $(".btnSalvar").click(function () {
@@ -122,12 +123,13 @@
             data: productJSON,
             success: function (ProductCreated) {
                 $("#modal").modal('hide');
+
                 var linhaNovoProduto = `<tr id="${ProductCreated.id}">`;
                 linhaNovoProduto += `<td>${ProductCreated.name}</td>`;
-                linhaNovoProduto += `<td>${ProductCreated.price}</td>`;
+                linhaNovoProduto += `<td>${ajustaFormatoMoeda(ProductCreated.price)}</td>`;
                 linhaNovoProduto += `<td>${ProductCreated.brand}</td>`;
-                linhaNovoProduto += `<td>${ProductCreated.createdAt}</td>`;
-                linhaNovoProduto += `<td>${ProductCreated.updatedAt}</td>`;
+                linhaNovoProduto += `<td>${ajustaFormatoData(ProductCreated.createdAt)}</td>`;
+                linhaNovoProduto += `<td>${ajustaFormatoData(ProductCreated.updatedAt)}</td>`;
                 linhaNovoProduto += `<td><button class="btn btn-sm btn-outline-info"
                     onclick="SearchProductById(${ProductCreated.id})">Edit</button> |
                     <button class="btn btn-sm btn-outline-danger"
@@ -148,7 +150,7 @@
             },
             success: function (product) {
                 mostrarModal();
-                escolherTituloModal(`Update Product ${product.name}`);
+                escolherTituloModal(`Update Product - ${product.name}`);
                 $(".productId").val(product.id);
                 $(".Name").val(product.name);
                 $(".Price").val(product.price);
@@ -172,10 +174,10 @@
                 $("#modal").modal('hide');
                 var linhaTabela = $(`#${productUpdated.id}`);
                 linhaTabela[0].childNodes[0].innerText = productUpdated.name;
-                linhaTabela[0].childNodes[1].innerText = productUpdated.price;
+                linhaTabela[0].childNodes[1].innerText = ajustaFormatoMoeda(productUpdated.price);
                 linhaTabela[0].childNodes[2].innerText = productUpdated.brand;
-                linhaTabela[0].childNodes[3].innerText = productUpdated.createdAt;
-                linhaTabela[0].childNodes[4].innerText = productUpdated.updatedAt;
+                linhaTabela[0].childNodes[3].innerText = ajustaFormatoData(productUpdated.createdAt);
+                linhaTabela[0].childNodes[4].innerText = ajustaFormatoData(productUpdated.updatedAt);
                 limparFormulario();
             }
         });
@@ -214,15 +216,12 @@
         tabela += '</thead>';
         tabela += '<tbody>';
         for (indice = 0; indice < products.length; indice++) {
-            var vCreatedAt = new Date(products[indice].createdAt);
-            var vUpdatedAt = new Date(products[indice].updatedAt);
-
             tabela += `<tr id="${products[indice].id}">`;
             tabela += `<td>${products[indice].name}</td>`;
-            tabela += `<td>${products[indice].price}</td>`;
+            tabela += `<td>${ajustaFormatoMoeda(products[indice].price)}</td>`;
             tabela += `<td>${products[indice].brand}</td>`;
-            tabela += `<td>${vCreatedAt.toLocaleDateString('pt-BR')}</td>`;
-            tabela += `<td>${vUpdatedAt.toLocaleDateString('pt-BR')}</td>`;
+            tabela += `<td>${ajustaFormatoData(products[indice].createdAt)}</td>`;
+            tabela += `<td>${ajustaFormatoData(products[indice].updatedAt)}</td>`;
             tabela += `<td><button class="btn btn-sm btn-outline-info" onclick="SearchProductById(${products[indice].id})">Edit</button> |
                         <button class="btn btn-sm btn-outline-danger" onclick="DeleteProduct(${products[indice].id})">Delete</button></td>`;
             tabela += '</tr>';
@@ -308,6 +307,15 @@
 
     function escolherTituloModal(texto) {
         $(".modal-title").text(texto);
+    }
+
+    function ajustaFormatoData(pData) {
+        var lDataFormatada = new Date(pData);
+        return lDataFormatada.toLocaleDateString('pt-BR')
+    }
+
+    function ajustaFormatoMoeda(pValor) {
+        return pValor.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
     }
 
 </script>
